@@ -2,15 +2,17 @@ NAME= philo_1
 SRC_PATH=philo_one
 HDR_PATH= includes
 OBJ_PATH= obj
+TOOLS_PATH= obj/tools
 
-SRC= philo.c
-HDR_NAME=
+TOOLS= ../tools/ft_atoi.c
+SRC= philo.c init.c $(TOOLS)
+HDR_NAME= philosophers.h
 
 OBJ_NAME= $(SRC:.c=.o)
 
 OBJ= $(addprefix $(OBJ_PATH)/,$(OBJ_NAME))
 
-H_FLAG= #-I $(HDR_PATH)
+H_FLAG= -I $(HDR_PATH)
 
 COMP= gcc -pthread
 
@@ -23,7 +25,7 @@ $(NAME) : $(OBJ)
 	@echo "						Compilation of $(NAME):  \033[1;32mOK\033[m"
 
 $(OBJ_PATH)/%.o:  $(SRC_PATH)/%.c $(HDR)
-	@mkdir -p $(OBJ_PATH)
+	@mkdir -p $(OBJ_PATH) $(TOOLS_PATH)
 	@$(COMP) -g $(FLAGS) $(H_FLAG) -g -o $@ -c $<
 
 clean:
