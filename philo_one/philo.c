@@ -11,7 +11,7 @@ void *func(void *val)
     philo =(t_philo *)val;
     j =0;
     i = philo->index_of_phil;
-    if(i < philo->number_phil-1)
+    if(i < philo->number_phil)
         philo->index_of_phil++;
     else 
     {
