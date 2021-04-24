@@ -6,33 +6,47 @@ void *func(void *val)
 {
     t_philo *philo;
     int i;
+    int j;
 
     philo =(t_philo *)val;
+    j =0;
     i = philo->index_of_phil;
-    if(i < 9)
-    {
+    if(i < philo->number_phil-1)
         philo->index_of_phil++;
-    }
     else 
     {
         philo->index_of_phil = 0;
         i = 0;
     }
-    printf("Philosopher %d is thinking\n", i);
-    pthread_mutex_lock(&philo->forks[i]);
-    gettimeofday(&current_time,NULL);
-    printf("%ld ms Philosopher %d has taking a fork\n",get_current(),i);
-    pthread_mutex_lock(&philo->forks[(i + 1) % philo->number_phil]);
-    gettimeofday(&current_time, NULL);
-    printf("%ld ms Philosopher %d has taking a fork\n",-1 *((start.tv_usec-current_time.tv_usec)/1000 + start.tv_usec - current_time.tv_usec),i);
-    printf("Philosopher %d is eating\n",i);
+
+    if(philo->state[i] != EAT)
+        printf("Philosopher %d is thinking\n", i);
+    if(!pthread_mutex_lock(&philo->forks[i]))
+    {
+        gettimeofday(&current_time,NULL);
+        printf("%ld ms Philosopher %d has taking a fork 1\n",-1 *((start.tv_usec-current_time.tv_usec)/10000 + start.tv_usec - current_time.tv_usec),i);
+        j++;
+    }
+    if(!pthread_mutex_lock(&philo->forks[(i + 1) % philo->number_phil]))
+    {
+        gettimeofday(&current_time, NULL);
+        printf("%ld ms Philosopher %d has taking a fork 2\n",-1 *((start.tv_usec-current_time.tv_usec)/10000 + start.tv_usec - current_time.tv_usec),i);
+        printf("Philosopher %d is eating\n",i);
+        j++;
+    }
+    if(j == 2)
+        philo->state[i] = EAT;
     usleep(philo->time_to_eat*1000);
     gettimeofday(&current_time, NULL);
     pthread_mutex_unlock(&philo->forks[i]);
     pthread_mutex_unlock(&philo->forks[(i + 1) % philo->number_phil]);
-    printf("Philosopher %d finished eating in %ld ms\n",i,-1 * ((start.tv_usec-current_time.tv_usec)/1000 + start.tv_usec - current_time.tv_usec));
-    printf("Philosopher %d is sleeping\n", i);
-    usleep(philo->time_to_sleep*1000);
+    if(j == 2)
+    {
+        printf("Philosopher %d finished eating in %ld ms\n",i,-1 *((start.tv_usec-current_time.tv_usec)/10000 + start.tv_usec - current_time.tv_usec));
+        printf("Philosopher %d is sleeping\n", i);
+        philo->state[i] = NOT_EAT;
+        usleep(philo->time_to_sleep*1000);
+    }
     func(philo);
     val = (void *)philo;
     return (val);
