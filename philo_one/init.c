@@ -2,9 +2,10 @@
 
 long get_current()
 {
-    struct timeval current;
-    gettimeofday(&current, NULL);
-    return (current.tv_sec + current.tv_usec); /* something wrong !! */
+   	struct timeval	current;
+	gettimeofday(&current, NULL);
+	return (current.tv_sec * 1000L + current.tv_usec / 1000L);
+
 }
 
 t_philo * init(char **arg)

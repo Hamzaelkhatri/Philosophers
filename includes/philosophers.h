@@ -25,6 +25,7 @@ typedef struct s_philo
 }t_philo;
 
 long long	ft_atoi(const char *str);
+long get_current();
 t_philo *init(char **arg);
 
 #endif
