@@ -9,7 +9,15 @@ void *func(void *val)
 
     philo =(t_philo *)val;
     i = philo->index_of_phil;
-    philo->index_of_phil++;
+    if(i < 9)
+    {
+        philo->index_of_phil++;
+    }
+    else 
+    {
+        philo->index_of_phil = 0;
+        i = 0;
+    }
     printf("Philosopher %d is thinking\n", i);
     pthread_mutex_lock(&philo->forks[i]);
     gettimeofday(&current_time,NULL);
@@ -18,7 +26,6 @@ void *func(void *val)
     gettimeofday(&current_time, NULL);
     printf("%ld ms Philosopher %d has taking a fork\n",-1 *((start.tv_usec-current_time.tv_usec)/1000 + start.tv_usec - current_time.tv_usec),i);
     printf("Philosopher %d is eating\n",i);
-    // sleep(1);
     usleep(philo->time_to_eat*1000);
     gettimeofday(&current_time, NULL);
     pthread_mutex_unlock(&philo->forks[i]);
@@ -26,8 +33,9 @@ void *func(void *val)
     printf("Philosopher %d finished eating in %ld ms\n",i,-1 * ((start.tv_usec-current_time.tv_usec)/1000 + start.tv_usec - current_time.tv_usec));
     printf("Philosopher %d is sleeping\n", i);
     usleep(philo->time_to_sleep*1000);
+    func(philo);
     val = (void *)philo;
-    return (NULL);
+    return (val);
 }
 
 int check_args(char **ag)
