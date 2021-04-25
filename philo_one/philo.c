@@ -21,13 +21,12 @@ void *func(void *val)
 //        printf("----------------------------------------------------\n");
     if(philo->state[i] != EAT)
     {
-        printf("\u263A\n");
         printf("%d ms Philosopher %d is thinking\n",get_current() - philo->current_time, i);
     }
     if(!pthread_mutex_lock(&philo->forks[i]))
     {
         gettimeofday(&current_time,NULL);
-        printf("%d ms Philosopher %d has taking a \xF0\x9F\x8D\xB4\n",get_current() - philo->current_time,i);
+        printf("%d ms Philosopher %d has taking a fork\n",get_current() - philo->current_time,i);
         j++;
     }
     if(!pthread_mutex_lock(&philo->forks[(i + 1) % philo->number_phil]))
