@@ -4,7 +4,7 @@ HDR_PATH= includes
 OBJ_PATH= obj
 TOOLS_PATH= obj/tools
 
-TOOLS= ../tools/ft_atoi.c
+TOOLS= ../tools/ft_atoi.c ../tools/ft_itoa.c
 SRC= philo.c init.c $(TOOLS)
 HDR_NAME= philosophers.h
 

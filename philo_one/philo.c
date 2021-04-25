@@ -18,37 +18,43 @@ void *func(void *val)
         philo->index_of_phil = 0;
         i = 0;
     }
-
+//        printf("----------------------------------------------------\n");
     if(philo->state[i] != EAT)
-        printf("Philosopher %d is thinking\n", i);
+    {
+        printf("\u263A\n");
+        printf("%d ms Philosopher %d is thinking\n",get_current() - philo->current_time, i);
+    }
     if(!pthread_mutex_lock(&philo->forks[i]))
     {
         gettimeofday(&current_time,NULL);
-        printf("%ld ms Philosopher %d has taking a fork 1\n",-1 *((start.tv_usec-current_time.tv_usec)/10000 + start.tv_usec - current_time.tv_usec),i);
+        printf("%d ms Philosopher %d has taking a \xF0\x9F\x8D\xB4\n",get_current() - philo->current_time,i);
         j++;
     }
     if(!pthread_mutex_lock(&philo->forks[(i + 1) % philo->number_phil]))
     {
         gettimeofday(&current_time, NULL);
-        printf("%ld ms Philosopher %d has taking a fork 2\n",-1 *((start.tv_usec-current_time.tv_usec)/10000 + start.tv_usec - current_time.tv_usec),i);
-        printf("Philosopher %d is eating\n",i);
+        printf("%ld ms Philosopher %d has taking a fork left\n",get_current() - philo->current_time,i);
+        printf("%ld ms Philosopher %d is eating\n",get_current() - philo->current_time,i);
         j++;
     }
     if(j == 2)
-        philo->state[i] = EAT;
-    usleep(philo->time_to_eat*1000);
-    gettimeofday(&current_time, NULL);
-    pthread_mutex_unlock(&philo->forks[i]);
-    pthread_mutex_unlock(&philo->forks[(i + 1) % philo->number_phil]);
-    if(j == 2)
     {
-        printf("Philosopher %d finished eating in %ld ms\n",i,-1 *((start.tv_usec-current_time.tv_usec)/10000 + start.tv_usec - current_time.tv_usec));
-        printf("Philosopher %d is sleeping\n", i);
+        philo->state[i] = EAT;
+        gettimeofday(&current_time, NULL);
+        usleep(philo->time_to_eat * 1000);
         philo->state[i] = NOT_EAT;
+        pthread_mutex_unlock(&philo->forks[i]);
+        pthread_mutex_unlock(&philo->forks[(i + 1) % philo->number_phil]);
+        philo->last_time_eat[i] = ft_itoa(get_current());
+        printf("%ld ms Philosopher %d is sleeping\n",get_current() - philo->current_time, i);
         usleep(philo->time_to_sleep*1000);
+        j = 0;
+    }
+    else if(philo->last_time_eat[i])
+    {
+
     }
     func(philo);
-    val = (void *)philo;
     return (val);
 }
 
@@ -79,12 +85,12 @@ void do_stuff(t_philo *philo)
     int i;
 
     i = 0;
+    printf("----TIME---------PHILOSOPHER---------OPERATION------\n");
     while (i < philo->number_phil)
     {
         pthread_create(&philo->Philosophers[i], NULL, (void *)func, (void *)philo);
         i++;
     }
-
 }
 
 void waiting_threads(t_philo *philo)
@@ -97,6 +103,7 @@ void waiting_threads(t_philo *philo)
         pthread_join(philo->Philosophers[i], NULL);
         i++;
     }
+        printf("----------------------------------------------------\n");
 }
 
 void destroy_mutex(t_philo *philo)

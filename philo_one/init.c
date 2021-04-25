@@ -4,13 +4,13 @@ long get_current()
 {
    	struct timeval	current;
 	gettimeofday(&current, NULL);
-	return (current.tv_sec * 1000L + current.tv_usec / 1000L);
-
+	return (current.tv_sec * 1000 + current.tv_usec / 1000);
 }
 
 t_philo * init(char **arg)
 {
     t_philo *philosopher;
+    int i;
 
     philosopher = malloc(sizeof(t_philo));
     if(!philosopher)
@@ -30,6 +30,14 @@ t_philo * init(char **arg)
     if(arg[5])
         philosopher->number_time_to_eat = ft_atoi(arg[5]);
     philosopher->current_time = get_current();
+    philosopher->last_time_eat = malloc(sizeof(char *) * ft_atoi(arg[1])+1);
+    philosopher->last_time_eat[ft_atoi(arg[1])] = NULL;
+    i = 0;
+    while (i < ft_atoi(arg[1]))
+    {
+        philosopher->last_time_eat[i] = ft_itoa(get_current());
+        i++;
+    }
     philosopher->number_phil = ft_atoi(arg[1]);
     philosopher->index_of_phil = 0;
 
