@@ -21,7 +21,6 @@ void *func(void *val)
             philo->state[i] = NAN;
             i++;
         }
-
         i = 0;
     }
     if (philo->state[i] == NAN || philo->state[i] == THINKING || philo->state[i] == SLEEPING)
@@ -29,12 +28,12 @@ void *func(void *val)
         printf("\e[0;31m %d ms Philosopher %d is thinking\n", get_current() - philo->current_time, i);
         philo->state[i] = THINKING;
     }
-    if (philo->state[i] == THINKING && !pthread_mutex_lock(&philo->forks[i])) // && philo->state[i] != EAT
+    if (!pthread_mutex_lock(&philo->forks[i]))
     {
         printf("\e[0;32m %d ms Philosopher %d has taking a fork 1\n", get_current() - philo->current_time, i);
         j++;
     }
-    if (philo->state[i] == THINKING && !pthread_mutex_lock(&philo->forks[(i + 1) % philo->number_phil])) // && philo->state[i] != EAT
+    if (!pthread_mutex_lock(&philo->forks[(i + 1) % philo->number_phil]))
     {
         printf("\e[0;32m %ld ms Philosopher %d has taking a fork 2\n", get_current() - philo->current_time, i);
         j++;
@@ -44,6 +43,7 @@ void *func(void *val)
         printf("\e[1;34m %ld ms Philosopher %d is eating\n", get_current() - philo->current_time, i);
         philo->state[i] = EAT;
         usleep(philo->time_to_eat * 1000);
+        philo->times[i]->last_time_eat = get_current();
         pthread_mutex_unlock(&philo->forks[i]);
         pthread_mutex_unlock(&philo->forks[(i + 1) % philo->number_phil]);
         printf("\e[0;35m %ld ms Philosopher %d is sleeping\n", get_current() - philo->current_time, i);
@@ -52,11 +52,11 @@ void *func(void *val)
         philo->state[i] = NAN;
         j = 0;
     }
-    else
+    if (get_current() - philo->times[i]->last_time_eat > philo->time_to_die)
     {
-        philo->state[i] = THINKING;
+        printf("\e[0;33m %ld ms %d is die :(\n", get_current() - philo->current_time, i);
+        exit(1);
     }
-    usleep(20);
     func(philo);
     return (val);
 }
@@ -92,6 +92,9 @@ void do_stuff(t_philo *philo)
         pthread_create(&philo->Philosophers[i], NULL, (void *)func, (void *)philo);
         i++;
     }
+    i = 0;
+    // while (i < philo->number_phil)
+    // pthread_detach(philo->Philosophers[i++]);
 }
 
 void waiting_threads(t_philo *philo)
