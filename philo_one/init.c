@@ -21,9 +21,18 @@ t_philo * init(char **arg)
     philosopher->forks = malloc(sizeof(pthread_mutex_t) * ft_atoi(arg[1]));
     if(!philosopher->forks)
         exit(1);
-    philosopher->state = malloc(sizeof(pthread_t) * ft_atoi(arg[1]));
+    philosopher->state = malloc(sizeof(pthread_t) * ft_atoi(arg[1]) + 1);
     if(!philosopher->state)
         exit(1);
+    i = 0;
+    philosopher->number_phil = ft_atoi(arg[1]);
+    while (i < philosopher->number_phil)
+    {
+        philosopher->state[i] = NAN;
+        i++;
+    }
+    philosopher->state[i] = '\0';
+            
     philosopher->time_to_die = ft_atoi(arg[2]);
     philosopher->time_to_eat = ft_atoi(arg[3]);
     philosopher->time_to_sleep = ft_atoi(arg[4]);
@@ -38,7 +47,6 @@ t_philo * init(char **arg)
         philosopher->last_time_eat[i] = ft_itoa(get_current());
         i++;
     }
-    philosopher->number_phil = ft_atoi(arg[1]);
     philosopher->index_of_phil = 0;
 
     return (philosopher);

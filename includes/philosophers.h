@@ -1,7 +1,9 @@
 #ifndef PHILOSPHERS_H
 # define PHILOSPHERS_H
 # define EAT '1'
-# define NOT_EAT '0'
+# define NAN '0'
+# define SLEEPING '2'
+# define THINKING '3'
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
