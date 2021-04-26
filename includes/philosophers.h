@@ -1,27 +1,26 @@
 #ifndef PHILOSPHERS_H
 # define PHILOSPHERS_H
-# define EAT '1'
-# define NAN '0'
-# define SLEEPING '2'
-# define THINKING '3'
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include <pthread.h>
 #include <unistd.h>
 #include <sys/time.h>
+# define EAT '1'
+# define NAN '0'
+# define SLEEPING '2'
+# define THINKING '3'
 
 typedef struct s_times
 {
-    int index;
     long last_time_eat;
-}s_times;
+}t_times;
 
 typedef struct s_philo
 {
     pthread_mutex_t *forks;
     pthread_t *Philosophers;
-    char    **last_time_eat;
+    t_times    **times;
     long	time_to_die;
 	long	time_to_eat;
 	long	time_to_sleep;

@@ -32,22 +32,20 @@ t_philo * init(char **arg)
         i++;
     }
     philosopher->state[i] = '\0';
-            
+    philosopher->times = malloc(sizeof(t_times *));
+    i = 0;
+    while (i < philosopher->number_phil)
+    {
+        philosopher->times[i] = malloc(sizeof(t_times));
+        philosopher->times[i]->last_time_eat = get_current();
+        i++;
+    }
     philosopher->time_to_die = ft_atoi(arg[2]);
     philosopher->time_to_eat = ft_atoi(arg[3]);
     philosopher->time_to_sleep = ft_atoi(arg[4]);
     if(arg[5])
         philosopher->number_time_to_eat = ft_atoi(arg[5]);
-    philosopher->current_time = get_current();
-    philosopher->last_time_eat = malloc(sizeof(char *) * ft_atoi(arg[1])+1);
-    philosopher->last_time_eat[ft_atoi(arg[1])] = NULL;
-    i = 0;
-    while (i < ft_atoi(arg[1]))
-    {
-        philosopher->last_time_eat[i] = ft_itoa(get_current());
-        i++;
-    }
     philosopher->index_of_phil = 0;
-
+    philosopher->current_time = get_current();
     return (philosopher);
 }
