@@ -43,18 +43,21 @@ void *func(void *val)
         printf("\e[1;34m %ld ms Philosopher %d is eating\n", get_current() - philo->current_time, i);
         philo->state[i] = EAT;
         usleep(philo->time_to_eat * 1000);
-        philo->times[i]->last_time_eat = get_current();
         pthread_mutex_unlock(&philo->forks[i]);
         pthread_mutex_unlock(&philo->forks[(i + 1) % philo->number_phil]);
         printf("\e[0;35m %ld ms Philosopher %d is sleeping\n", get_current() - philo->current_time, i);
         philo->state[i] = SLEEPING;
         usleep(philo->time_to_sleep * 1000);
+        philo->times[i]->last_time_eat = get_current();
         philo->state[i] = NAN;
         j = 0;
     }
     if (get_current() - philo->times[i]->last_time_eat > philo->time_to_die)
     {
+        // printf("[%ld last time]", get_current() - philo->times[i]->last_time_eat, i);
+        pthread_mutex_lock(&philo->died);
         printf("\e[0;33m %ld ms %d is die :(\n", get_current() - philo->current_time, i);
+        pthread_mutex_unlock(&philo->died);
         exit(1);
     }
     func(philo);
@@ -80,6 +83,7 @@ void init_mutex(t_philo *philo)
         pthread_mutex_init(&philo->forks[i], NULL);
         i++;
     }
+    pthread_mutex_init(&philo->died, NULL);
 }
 
 void do_stuff(t_philo *philo)
