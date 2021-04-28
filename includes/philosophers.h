@@ -13,23 +13,23 @@
 
 typedef struct s_times
 {
-	long last_time_eat;
+    long start;
+    long last_time_eat;
 } t_times;
 
 typedef struct s_philo
 {
-	pthread_mutex_t *forks;
-	pthread_mutex_t died;
-	pthread_t *Philosophers;
-	t_times **times;
-	long time_to_die;
-	long time_to_eat;
-	long time_to_sleep;
-	long current_time;
-	int number_phil;
-	int index_of_phil;
-	long number_time_to_eat;
-	char *state;
+    pthread_mutex_t *forks;
+    pthread_mutex_t died;
+    pthread_t Philosophers;
+    t_times **times;
+    long time_to_die;
+    long time_to_eat;
+    long time_to_sleep;
+    int number_phil;
+    int index_of_phil;
+    long number_time_to_eat;
+    char *state;
 } t_philo;
 
 long long ft_atoi(const char *str);
