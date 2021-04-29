@@ -1,32 +1,89 @@
 #include "philosophers.h"
 
-void *is_dead(t_philo *philo)
+void print_operation(t_philo *philo, int op)
 {
     int i;
 
-    i = -100;
-    // puts("he is checking...");
-    if (get_current() - philo->times[philo->index_of_phil]->last_time_eat > philo->time_to_die)
+    i = philo->index_of_phil;
+    if (pthread_mutex_lock(&philo->times[i]->print) < 0)
+        exit(1);
+    if (op == 1)
+        printf("\e[1;34m %ld ms Philosopher %d is eating\n", get_current() - philo->times[i]->start, i);
+    if (op == 2)
     {
-        pthread_mutex_lock(&philo->died);
-        printf("\e[0;33m %ld ms %d is die :(\n", get_current() - philo->times[philo->index_of_phil]->start, philo->index_of_phil);
-        exit(0);
+        printf("\e[0;32m %d ms Philosopher %d has taking a fork 1\n", get_current() - philo->times[i]->start, i);
     }
-    else
+    if (op == 3)
     {
-        pthread_mutex_unlock(&philo->died);
+        printf("\e[0;32m %ld ms Philosopher %d has taking a fork 2\n", get_current() - philo->times[i]->start, i);
     }
-    printf("\e[0;33m [checking for %i---> %i]\n", philo->index_of_phil, i);
-    // while (i < philo->number_phil)
-    // {
-    //     if (get_current() - philo->times[i]->last_time_eat > philo->time_to_die)
-    //     {
-    //         printf("\e[0;33m %ld ms %d is die :(\n", get_current() - philo->current_time, i);
-    //         exit(1);
-    //     }
-    //     usleep(20);
-    //     i++;
-    // }
+    if (op == 4)
+    {
+        printf("\e[0;35m %ld ms Philosopher %d is sleeping\n", get_current() - philo->times[i]->start, i);
+    }
+    if (op == 5)
+    {
+        printf("\e[0;36m %ld ms Philosopher %d is thinking\n", get_current() - philo->times[i]->start, i);
+    }
+    if (op == 6)
+    {
+        printf("\e[0;33m %ld ms %d is die\n", get_current() - philo->times[i]->start, philo->index_of_phil);
+    }
+    pthread_mutex_unlock(&philo->times[i]->print);
+}
+
+void *is_dead(t_philo *philo)
+{
+    int i;
+    long time;
+
+    i = philo->index_of_phil;
+    while (philo->check_died != 1)
+    {
+        time = get_current();
+        if (time - philo->times[i]->last_time_eat > philo->time_to_die)
+        {
+            philo->check_died = 1;
+            print_operation(philo, 6);
+            pthread_mutex_unlock(&philo->died);
+            exit(0);
+            // break;
+        }
+        usleep(100);
+    }
+}
+
+void get_fork(t_philo *philo)
+{
+    int i;
+
+    i = philo->index_of_phil;
+    pthread_mutex_lock(&philo->forks[i]);
+    print_operation(philo, 2);
+    pthread_mutex_lock(&philo->forks[(i + 1) % philo->number_phil]);
+    print_operation(philo, 3);
+}
+
+void start_eating(t_philo *philo)
+{
+    int i;
+
+    i = philo->index_of_phil;
+    print_operation(philo, 1);
+    usleep(philo->time_to_eat * 1000);
+    philo->times[i]->last_time_eat = get_current();
+}
+
+void end_eating(t_philo *philo)
+{
+    int i;
+
+    i = philo->index_of_phil;
+    pthread_mutex_unlock(&philo->forks[i]);
+    pthread_mutex_unlock(&philo->forks[(i + 1) % philo->number_phil]);
+    print_operation(philo, 4);
+    usleep(philo->time_to_sleep * 1000);
+    print_operation(philo, 5);
 }
 
 void *func(void *val)
@@ -34,55 +91,19 @@ void *func(void *val)
     t_philo *philo;
     pthread_t checker;
     int i;
-    int j;
-
-    philo = (t_philo *)val;
 
     philo = (t_philo *)val;
     pthread_create(&checker, NULL, (void *)is_dead, (void *)philo);
     pthread_detach(checker);
     while (1)
     {
-        j = 0;
-        i = philo->index_of_phil;
-        if (philo->state[i] == NAN || philo->state[i] == THINKING || philo->state[i] == SLEEPING)
-        {
-            printf("\e[0;31m %d ms Philosopher %d is thinking\n", get_current() - philo->times[i]->start, i);
-            philo->state[i] = THINKING;
-        }
-        if (!pthread_mutex_lock(&philo->forks[i]))
-        {
-            printf("\e[0;32m %d ms Philosopher %d has taking a fork 1\n", get_current() - philo->times[i]->start, i);
-            // is_dead(philo);
-            j++;
-        }
-        if (!pthread_mutex_lock(&philo->forks[(i + 1) % philo->number_phil]))
-        {
-            printf("\e[0;32m %ld ms Philosopher %d has taking a fork 2\n", get_current() - philo->times[i]->start, i);
-            j++;
-            // is_dead(philo);
-            // usleep(20);
-        }
-        if (j == 2)
-        {
-            printf("\e[1;34m %ld ms Philosopher %d is eating\n", get_current() - philo->times[i]->start, i);
-            philo->state[i] = EAT;
-            usleep(philo->time_to_eat * 1000);
-            philo->times[i]->last_time_eat = get_current();
-            pthread_mutex_unlock(&philo->forks[i]);
-            pthread_mutex_unlock(&philo->forks[(i + 1) % philo->number_phil]);
-            printf("\e[0;35m %ld ms Philosopher %d is sleeping\n", get_current() - philo->times[i]->start, i);
-            philo->state[i] = SLEEPING;
-            usleep(philo->time_to_sleep * 1000);
-            philo->state[i] = NAN;
-            j = 0;
-        }
-        sleep(100);
-        if (get_current() - philo->times[i]->last_time_eat > philo->time_to_die)
-        {
-            pthread_mutex_lock(&philo->died);
-            break;
-        }
+        get_fork(philo);
+        start_eating(philo);
+        end_eating(philo);
+        // if (philo->index_of_phil == philo->number_phil - 1)
+        // {
+        // philo->index_of_phil = 0;
+        // }
     }
     return (val);
 }
@@ -104,6 +125,7 @@ void init_mutex(t_philo *philo)
     while (i < philo->number_phil)
     {
         pthread_mutex_init(&philo->forks[i], NULL);
+        pthread_mutex_init(&philo->times[i]->print, NULL);
         i++;
     }
     pthread_mutex_init(&philo->died, NULL);
@@ -113,15 +135,15 @@ void do_stuff(t_philo *philo)
 {
     int i;
 
-    // pthread_create(&philo->Philosophers, NULL, (void *)is_dead, (void *)philo);
-    // pthread_detach(philo->Philosophers);
     i = 0;
+    pthread_mutex_lock(&philo->died);
     while (i < philo->number_phil)
     {
         pthread_create(&philo->Philosophers, NULL, (void *)func, (void *)philo);
+        pthread_detach(philo->Philosophers);
         philo->index_of_phil = i;
+        usleep(100);
         i++;
-        usleep(20);
     }
     i = 0;
 }
@@ -133,7 +155,7 @@ void waiting_threads(t_philo *philo)
     i = 0;
     while (i < philo->number_phil)
     {
-        pthread_join(philo->Philosophers, NULL);
+        // pthread_join(philo->Philosophers, NULL);
         i++;
     }
 }
@@ -166,5 +188,10 @@ int main(int ac, char **ag)
     init_mutex(philosopher);
     do_stuff(philosopher);
     waiting_threads(philosopher);
+    while (1)
+    {
+        /* code */
+    }
+
     destroy_mutex(philosopher);
 }

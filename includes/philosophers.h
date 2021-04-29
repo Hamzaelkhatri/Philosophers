@@ -15,6 +15,8 @@ typedef struct s_times
 {
     long start;
     long last_time_eat;
+    int last;
+    pthread_mutex_t print;
 } t_times;
 
 typedef struct s_philo
@@ -28,6 +30,7 @@ typedef struct s_philo
     long time_to_sleep;
     int number_phil;
     int index_of_phil;
+    int check_died;
     long number_time_to_eat;
     char *state;
 } t_philo;
