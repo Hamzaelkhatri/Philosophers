@@ -16,6 +16,7 @@ typedef struct s_philo
     pthread_mutex_t *forks;
     pthread_mutex_t died;
     pthread_mutex_t print;
+    pthread_mutex_t *mtx;
     long start;
     long last_time_eat;
     int left_fork;
@@ -34,6 +35,7 @@ typedef struct s_philosophers
     pthread_mutex_t died;
     pthread_mutex_t print;
     pthread_mutex_t *forks;
+    pthread_mutex_t *mtx;
     long time_to_die;
     long time_to_eat;
     int number_phil;
