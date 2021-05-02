@@ -26,18 +26,20 @@ void print_operation(t_philo *philo, int op)
     pthread_mutex_unlock(&philo->print);
 }
 
+pthread_mutex_t mtx;
+
 void *is_dead(t_philo *philo)
 {
+
+    // pthread_mutex_lock(&mtx);
     while (!philo->check_die)
     {
-        pthread_mutex_lock(&philo->died);
         usleep(10);
+        pthread_mutex_lock(&philo->died);
         if (get_current() - philo->last_time_eat > philo->time_to_die)
         {
-            // sleep(1);
             usleep(10);
-            pthread_mutex_unlock(&philo->died);
-            philo->check_die = 1;
+            pthread_mutex_lock(&mtx);
             print_operation(philo, 6);
             exit(1);
         }
@@ -113,7 +115,6 @@ void init_mutex(t_philosophers *philo)
     }
     pthread_mutex_init(&philo->print, NULL);
     pthread_mutex_init(&philo->died, NULL);
-    pthread_mutex_init(&philo->died, NULL);
 }
 
 void do_stuff(t_philosophers *philo)
@@ -123,8 +124,10 @@ void do_stuff(t_philosophers *philo)
     t_philo *philosophers;
 
     i = 0;
+    pthread_mutex_init(&mtx, NULL);
     while (i < philo->number_phil)
     {
+        // pthread_mutex_lock(mtx);
         philosophers = philo->philo[i];
         philosophers->forks = philo->forks;
         philosophers->died = philo->died;
@@ -132,8 +135,10 @@ void do_stuff(t_philosophers *philo)
         pthread_create(&pth, NULL, (void *)func, (void *)philosophers);
         pthread_detach(pth);
         usleep(100);
+        // pthread_mutex_unlock(mtx);
         i++;
     }
+    pthread_mutex_unlock(&mtx);
     i = 0;
 }
 
