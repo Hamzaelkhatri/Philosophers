@@ -14,28 +14,34 @@
 typedef struct s_philo
 {
     pthread_mutex_t *forks;
-    pthread_mutex_t died;
+    pthread_mutex_t *died;
     pthread_mutex_t print;
     pthread_mutex_t *mtx;
+    pthread_mutex_t *loop;
     long start;
     long last_time_eat;
     int left_fork;
     int right_fork;
     int name;
+    int done;
     long time_to_die;
     long time_to_eat;
     int check_die;
     long time_to_sleep;
     long number_time_to_eat;
-    char state;
+    int number_phil;
+    int num_to_eat;
 } t_philo;
 
 typedef struct s_philosophers
 {
-    pthread_mutex_t died;
+    pthread_mutex_t *died;
     pthread_mutex_t print;
     pthread_mutex_t *forks;
     pthread_mutex_t *mtx;
+    pthread_mutex_t *loop;
+    int done;
+    int num_to_eat;
     long time_to_die;
     long time_to_eat;
     int number_phil;

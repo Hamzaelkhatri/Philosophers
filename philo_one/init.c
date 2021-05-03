@@ -21,6 +21,9 @@ t_philosophers *init(char **arg)
     philo->time_to_die = ft_atoi(arg[2]);
     philo->time_to_eat = ft_atoi(arg[3]);
     philo->time_to_sleep = ft_atoi(arg[4]);
+    // philo->num_to_eat = 0;
+    // if (arg[5])
+    philo->num_to_eat = ft_atoi(arg[5]);
     if (!philo->philo)
         exit(1);
     while (i < philo->number_phil)
@@ -30,48 +33,16 @@ t_philosophers *init(char **arg)
         philo->philo[i]->left_fork = (i + 1) % philo->number_phil;
         philo->philo[i]->last_time_eat = get_current();
         philo->philo[i]->start = get_current();
-        philo->philo[i]->state = THINKING;
+        philo->philo[i]->number_phil = philo->number_phil;
         philo->philo[i]->name = i + 1;
         philo->philo[i]->time_to_eat = philo->time_to_eat;
+        philo->philo[i]->done = 0;
         philo->philo[i]->check_die = 0;
+        philo->philo[i]->num_to_eat = 0;
         philo->philo[i]->time_to_die = philo->time_to_die;
         philo->philo[i]->time_to_sleep = philo->time_to_sleep;
         i++;
     }
     philo->check_died = 0;
-
-    // if (!philosopher)
-    // exit(1);
-    // philosopher->forks = malloc(sizeof(pthread_mutex_t));
-    // if (!philosopher->forks)
-    // exit(1);
-    // philosopher->state = malloc(sizeof(pthread_t) * ft_atoi(arg[1]) + 1);
-    // if (!philosopher->state)
-    //     exit(1);
-    // i = 0;
-    // philosopher->check_died = 0;
-    // philosopher->number_phil = ft_atoi(arg[1]);
-    // while (i < philosopher->number_phil)
-    // {
-    // philosopher->state[i] = NAN;
-    // i++;
-    // }
-    // philosopher->state[i] = '\0';
-    // philosopher->times = (t_times **)malloc(sizeof(t_times *) * philosopher->number_phil);
-    // while (i < philosopher->number_phil)
-    // {
-    // philosopher->times[i] = malloc(sizeof(t_times));
-    // philosopher->times[i]->last_time_eat = get_current();
-    // philosopher->times[i]->start = get_current();
-    // philosopher->times[i]->last = 0;
-    // i++;
-    // }
-    // philosopher->times[i - 1]->last = 1;
-    // philosopher->time_to_die = ft_atoi(arg[2]);
-    // philosopher->time_to_eat = ft_atoi(arg[3]);
-    // philosopher->time_to_sleep = ft_atoi(arg[4]);
-    // if (arg[5])
-    // philosopher->number_time_to_eat = ft_atoi(arg[5]);
-    // philosopher->index_of_phil = 0;
     return (philo);
 }
