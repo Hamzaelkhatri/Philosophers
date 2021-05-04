@@ -19,6 +19,7 @@ typedef struct s_philo
     pthread_mutex_t *mtx;
     pthread_mutex_t *loop;
     long start;
+    int *finish;
     long last_time_eat;
     int left_fork;
     int right_fork;
@@ -40,6 +41,7 @@ typedef struct s_philosophers
     pthread_mutex_t *forks;
     pthread_mutex_t *mtx;
     pthread_mutex_t *loop;
+    int finish;
     int done;
     int num_to_eat;
     long time_to_die;
