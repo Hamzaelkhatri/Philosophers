@@ -1,10 +1,10 @@
-#include "philosophers.h"
+#include "philo.h"
 
 void print_operation(t_philo *philo, long time, int op)
 {
     int i;
 
-    pthread_mutex_lock(&philo->print);
+    sem_wait(philo->print);
     if (op == 1)
         printf("\e[1;34m %ld ms Philosopher %d is eating\n", get_current() - philo->start, philo->name);
     if (op == 2)
@@ -15,49 +15,53 @@ void print_operation(t_philo *philo, long time, int op)
         printf("\e[0;36m %ld ms Philosopher %d is thinking\n", get_current() - philo->start, philo->name);
     if (op == 6)
         printf("\e[0;33m %ld ms %d is die\n", get_current() - philo->start, philo->name);
-    pthread_mutex_unlock(&philo->print);
+    sem_post(philo->print);
 }
 
 void *is_dead(t_philo *philo)
 {
     int check = -1;
-    int i;
-    int count;
-
-    i = 0;
-    count = 0;
-    // while (i < philo->number_phil)
-    // {
-    // if (philo->done <= philo->num_to_eat)
-    // count++;
-    // i++;
-    // }
+    int i = 0;
 
     check = philo->time_to_die - (philo->time_to_eat + philo->time_to_sleep);
-    if (check > 0 && philo->time_to_eat > philo->time_to_sleep)
+    if (philo->time_to_die / philo->number_phil < 100)
         check = -1;
-    while (!philo->check_die)
+    while (1)
     {
-        pthread_mutex_lock(philo->died);
+        sem_wait(philo->died);
+        if (philo->num_to_eat != -1)
+        {
+            if (philo->num_to_eat == philo->done && !i)
+            {
+                *(philo->finish) += 1;
+                i = 1;
+            }
+            if (*(philo->finish) == philo->number_phil)
+            {
+                // puts("sdadsadsadsadsa");
+                sem_wait(philo->mtx);
+                printf("\tSimulation stop all philosophers eat %i", philo->num_to_eat);
+                sem_post(philo->loop);
+                break;
+            }
+        }
         if (get_current() - (philo->last_time_eat) >= philo->time_to_die && check <= 0)
         {
-            pthread_mutex_lock(philo->mtx);
+            puts("bslaaa");
+            sem_wait(philo->mtx);
             print_operation(philo, get_current() - (philo->last_time_eat), 6);
-            pthread_mutex_unlock(philo->loop);
+            sem_post(philo->loop);
             break;
         }
-        pthread_mutex_unlock(philo->died);
-        usleep(100);
+        sem_post(philo->died);
+        // usleep(100);
     }
 }
 
 void get_fork(t_philo *philo)
 {
-    int i;
-    t_philo *pth;
-
-    pthread_mutex_lock(&philo->forks[philo->right_fork]);
-    pthread_mutex_lock(&philo->forks[philo->left_fork]);
+    sem_wait(philo->forks);
+    sem_wait(philo->forks);
     print_operation(philo, get_current() - philo->start, 2);
     print_operation(philo, get_current() - philo->start, 2);
 }
@@ -72,8 +76,8 @@ void start_eating(t_philo *philo)
 
 void end_eating(t_philo *philo)
 {
-    pthread_mutex_unlock(&philo->forks[philo->right_fork]);
-    pthread_mutex_unlock(&philo->forks[philo->left_fork]);
+    sem_post(philo->forks);
+    sem_post(philo->forks);
     print_operation(philo, get_current() - philo->start, 4);
     usleep(philo->time_to_sleep * 1000);
     printf("\e[0;35m %ld ms Philosopher %d is thinking\n", get_current() - philo->start, philo->name);
@@ -84,7 +88,6 @@ void *func(void *val)
 {
     t_philo *philo;
     pthread_t thr;
-    int i;
 
     philo = (t_philo *)val;
     pthread_create(&thr, NULL, (void *)is_dead, (void *)philo);
@@ -94,34 +97,24 @@ void *func(void *val)
         get_fork(philo);
         start_eating(philo);
         end_eating(philo);
-        usleep(5);
+        // usleep(10);
     }
     return (val);
 }
 
-int check_args(char **ag)
-{
-    int i = 0;
-    // while (ag[i])
-    // {
-    // }
-}
-
 void init_mutex(t_philosophers *philo)
 {
-    int i;
-
-    i = 0;
-    philo->died = malloc(sizeof(pthread_mutex_t));
-    philo->loop = malloc(sizeof(pthread_mutex_t));
-    while (i < philo->number_phil)
-    {
-        pthread_mutex_init(&philo->forks[i], NULL);
-        i++;
-    }
-    pthread_mutex_init(&philo->print, NULL);
-    pthread_mutex_init(philo->died, NULL);
-    pthread_mutex_init(philo->loop, NULL);
+    sem_unlink("/forks");
+    sem_unlink("/prints");
+    sem_unlink("/dieds");
+    sem_unlink("/loops");
+    sem_unlink("/mtxs");
+    philo->forks = malloc(sizeof(sem_t));
+    philo->forks = sem_open("/forks", O_CREAT, O_RDWR, philo->number_phil);
+    philo->print = sem_open("/prints", O_CREAT, O_RDWR, 1);
+    philo->died = sem_open("/dieds", O_CREAT, O_RDWR, 1);
+    philo->loop = sem_open("/loops", O_CREAT, O_RDWR, 1);
+    philo->mtx = sem_open("/mtxs", O_CREAT, O_RDWR, 1);
 }
 
 void do_stuff(t_philosophers *philo)
@@ -130,9 +123,8 @@ void do_stuff(t_philosophers *philo)
     pthread_t pth;
     t_philo *philosophers;
 
-    philo->mtx = malloc(sizeof(pthread_mutex_t));
-    pthread_mutex_init(philo->mtx, NULL);
-    pthread_mutex_lock(philo->loop);
+    (philo->finish) = 0;
+    sem_wait(philo->loop);
     i = 0;
     while (i < philo->number_phil)
     {
@@ -140,35 +132,54 @@ void do_stuff(t_philosophers *philo)
         philosophers->forks = philo->forks;
         philosophers->died = philo->died;
         philosophers->loop = philo->loop;
+        philo->philo[i]->finish = &(philo->finish);
         philosophers->print = philo->print;
         philosophers->mtx = philo->mtx;
         pthread_create(&pth, NULL, (void *)func, (void *)philosophers);
         pthread_detach(pth);
         if (philo->check_died)
             break;
-        usleep(10);
+        // usleep(10);
         i++;
     }
-    pthread_mutex_lock(philo->loop);
-    pthread_mutex_unlock(philo->loop);
-    pthread_mutex_unlock(philo->mtx);
+    sem_wait(philo->loop);
+    // puts("hii");
+    // usleep(100);
+    sem_post(philo->loop);
+    sem_post(philo->mtx);
 }
 
-void destroy_mutex(t_philosophers *philo)
+void destroy_sem(t_philosophers *philo)
+{
+    int i;
+
+    i = 0;
+    sem_close(philo->died);
+    sem_close(philo->loop);
+    sem_close(philo->mtx);
+    sem_close(philo->forks);
+}
+
+void clean_leaks(t_philosophers *philo)
 {
     int i;
 
     i = 0;
     while (i < philo->number_phil)
     {
-        pthread_mutex_destroy(&philo->forks[i]);
+        free(philo->philo[i]);
         i++;
     }
+    free(philo->mtx);
+    free(philo->died);
+    free(philo->loop);
+    free(philo->philo);
+    free(philo);
 }
 
 int main(int ac, char **ag)
 {
-    int i;
+    t_philosophers *philosopher;
 
     if (ac < 5 || ac > 6)
     {
@@ -176,10 +187,14 @@ int main(int ac, char **ag)
         exit(0);
     }
 
-    t_philosophers *philosopher;
     philosopher = NULL;
     philosopher = init(ag);
     init_mutex(philosopher);
     do_stuff(philosopher);
-    destroy_mutex(philosopher);
+
+    // while (1)
+    //     ;
+    destroy_sem(philosopher);
+    // clean_leaks(philosopher);
+    return (0);
 }
