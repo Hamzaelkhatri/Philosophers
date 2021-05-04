@@ -21,24 +21,29 @@ void print_operation(t_philo *philo, long time, int op)
 void *is_dead(t_philo *philo)
 {
     int check = -1;
-    int i;
-    int count;
-
-    i = 0;
-    count = 0;
-    // while (i < philo->number_phil)
-    // {
-    // if (philo->done <= philo->num_to_eat)
-    // count++;
-    // i++;
-    // }
+    int i = 0;
 
     check = philo->time_to_die - (philo->time_to_eat + philo->time_to_sleep);
-    if (check > 0 && philo->time_to_eat > philo->time_to_sleep)
+    if (philo->time_to_die / philo->number_phil < 100)
         check = -1;
-    while (!philo->check_die)
+    while (1)
     {
         pthread_mutex_lock(philo->died);
+        if (philo->num_to_eat != -1)
+        {
+            if (philo->num_to_eat == philo->done && !i)
+            {
+                *(philo->finish) += 1;
+                i = 1;
+            }
+            if (*(philo->finish) == philo->number_phil)
+            {
+                pthread_mutex_lock(philo->mtx);
+                printf("Simulation stop all philosophers eat %i", philo->num_to_eat);
+                pthread_mutex_unlock(philo->loop);
+                break;
+            }
+        }
         if (get_current() - (philo->last_time_eat) >= philo->time_to_die && check <= 0)
         {
             pthread_mutex_lock(philo->mtx);
@@ -53,9 +58,6 @@ void *is_dead(t_philo *philo)
 
 void get_fork(t_philo *philo)
 {
-    int i;
-    t_philo *pth;
-
     pthread_mutex_lock(&philo->forks[philo->right_fork]);
     pthread_mutex_lock(&philo->forks[philo->left_fork]);
     print_operation(philo, get_current() - philo->start, 2);
@@ -84,7 +86,6 @@ void *func(void *val)
 {
     t_philo *philo;
     pthread_t thr;
-    int i;
 
     philo = (t_philo *)val;
     pthread_create(&thr, NULL, (void *)is_dead, (void *)philo);
@@ -94,17 +95,9 @@ void *func(void *val)
         get_fork(philo);
         start_eating(philo);
         end_eating(philo);
-        usleep(5);
+        usleep(10);
     }
     return (val);
-}
-
-int check_args(char **ag)
-{
-    int i = 0;
-    // while (ag[i])
-    // {
-    // }
 }
 
 void init_mutex(t_philosophers *philo)
@@ -112,8 +105,9 @@ void init_mutex(t_philosophers *philo)
     int i;
 
     i = 0;
-    philo->died = malloc(sizeof(pthread_mutex_t));
     philo->loop = malloc(sizeof(pthread_mutex_t));
+    philo->died = malloc(sizeof(pthread_mutex_t));
+    philo->mtx = malloc(sizeof(pthread_mutex_t));
     while (i < philo->number_phil)
     {
         pthread_mutex_init(&philo->forks[i], NULL);
@@ -122,6 +116,7 @@ void init_mutex(t_philosophers *philo)
     pthread_mutex_init(&philo->print, NULL);
     pthread_mutex_init(philo->died, NULL);
     pthread_mutex_init(philo->loop, NULL);
+    pthread_mutex_init(philo->mtx, NULL);
 }
 
 void do_stuff(t_philosophers *philo)
@@ -130,9 +125,8 @@ void do_stuff(t_philosophers *philo)
     pthread_t pth;
     t_philo *philosophers;
 
-    philo->mtx = malloc(sizeof(pthread_mutex_t));
-    pthread_mutex_init(philo->mtx, NULL);
     pthread_mutex_lock(philo->loop);
+    (philo->finish) = 0;
     i = 0;
     while (i < philo->number_phil)
     {
@@ -140,16 +134,15 @@ void do_stuff(t_philosophers *philo)
         philosophers->forks = philo->forks;
         philosophers->died = philo->died;
         philosophers->loop = philo->loop;
+        philo->philo[i]->finish = &(philo->finish);
         philosophers->print = philo->print;
         philosophers->mtx = philo->mtx;
         pthread_create(&pth, NULL, (void *)func, (void *)philosophers);
         pthread_detach(pth);
-        if (philo->check_died)
-            break;
-        usleep(10);
         i++;
     }
     pthread_mutex_lock(philo->loop);
+    usleep(100);
     pthread_mutex_unlock(philo->loop);
     pthread_mutex_unlock(philo->mtx);
 }
@@ -159,6 +152,9 @@ void destroy_mutex(t_philosophers *philo)
     int i;
 
     i = 0;
+    pthread_mutex_destroy(philo->died);
+    pthread_mutex_destroy(philo->loop);
+    pthread_mutex_destroy(philo->mtx);
     while (i < philo->number_phil)
     {
         pthread_mutex_destroy(&philo->forks[i]);
@@ -166,9 +162,26 @@ void destroy_mutex(t_philosophers *philo)
     }
 }
 
-int main(int ac, char **ag)
+void clean_leaks(t_philosophers *philo)
 {
     int i;
+
+    i = 0;
+    while (i < philo->number_phil)
+    {
+        free(philo->philo[i]);
+        i++;
+    }
+    free(philo->mtx);
+    free(philo->died);
+    free(philo->loop);
+    free(philo->philo);
+    free(philo);
+}
+
+int main(int ac, char **ag)
+{
+    t_philosophers *philosopher;
 
     if (ac < 5 || ac > 6)
     {
@@ -176,10 +189,11 @@ int main(int ac, char **ag)
         exit(0);
     }
 
-    t_philosophers *philosopher;
     philosopher = NULL;
     philosopher = init(ag);
     init_mutex(philosopher);
     do_stuff(philosopher);
     destroy_mutex(philosopher);
+    clean_leaks(philosopher);
+    return (0);
 }

@@ -21,7 +21,7 @@ t_philosophers *init(char **arg)
     philo->time_to_die = ft_atoi(arg[2]);
     philo->time_to_eat = ft_atoi(arg[3]);
     philo->time_to_sleep = ft_atoi(arg[4]);
-    philo->num_to_eat = 0;
+    philo->num_to_eat = -1;
     if (arg[5])
         philo->num_to_eat = ft_atoi(arg[5]);
     if (!philo->philo)
@@ -36,9 +36,9 @@ t_philosophers *init(char **arg)
         philo->philo[i]->number_phil = philo->number_phil;
         philo->philo[i]->name = i + 1;
         philo->philo[i]->time_to_eat = philo->time_to_eat;
-        philo->philo[i]->done = philo->num_to_eat;
+        philo->philo[i]->done = 0;
         philo->philo[i]->check_die = 0;
-        philo->philo[i]->num_to_eat = 0;
+        philo->philo[i]->num_to_eat = philo->num_to_eat;
         philo->philo[i]->time_to_die = philo->time_to_die;
         philo->philo[i]->time_to_sleep = philo->time_to_sleep;
         i++;
