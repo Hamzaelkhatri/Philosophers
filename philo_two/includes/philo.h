@@ -1,23 +1,21 @@
-#ifndef PHILOSPHERS_H
-#define PHILOSPHERS_H
+#ifndef PHILO_H
+#define PHILO_H
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include <pthread.h>
+#include <semaphore.h>
 #include <unistd.h>
 #include <sys/time.h>
-#define EAT '1'
-#define NAN '0'
-#define SLEEPING '2'
-#define THINKING '3'
+#include <fcntl.h>
 
 typedef struct s_philo
 {
-    pthread_mutex_t *forks;
-    pthread_mutex_t *died;
-    pthread_mutex_t print;
-    pthread_mutex_t *mtx;
-    pthread_mutex_t *loop;
+    sem_t *forks;
+    sem_t *died;
+    sem_t *print;
+    sem_t *mtx;
+    sem_t *loop;
     long start;
     int *finish;
     long last_time_eat;
@@ -36,11 +34,11 @@ typedef struct s_philo
 
 typedef struct s_philosophers
 {
-    pthread_mutex_t *died;
-    pthread_mutex_t print;
-    pthread_mutex_t *forks;
-    pthread_mutex_t *mtx;
-    pthread_mutex_t *loop;
+    sem_t *died;
+    sem_t *print;
+    sem_t *forks;
+    sem_t *mtx;
+    sem_t *loop;
     int finish;
     int done;
     int num_to_eat;

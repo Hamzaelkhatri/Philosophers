@@ -1,10 +1,10 @@
-NAME= philo_1
-SRC_PATH=philo_one
+NAME= philo_one
+SRC_PATH=.
 HDR_PATH= includes
 OBJ_PATH= obj
 TOOLS_PATH= obj/tools
 
-TOOLS= /tools/ft_atoi.c /tools/ft_itoa.c
+TOOLS= ./tools/ft_atoi.c ./tools/ft_itoa.c
 SRC= philo.c init.c $(TOOLS)
 HDR_NAME= philosophers.h
 

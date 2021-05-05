@@ -38,7 +38,6 @@ void *is_dead(t_philo *philo)
             }
             if (*(philo->finish) == philo->number_phil)
             {
-                // puts("sdadsadsadsadsa");
                 sem_wait(philo->mtx);
                 printf("\tSimulation stop all philosophers eat %i", philo->num_to_eat);
                 sem_post(philo->loop);
@@ -47,14 +46,12 @@ void *is_dead(t_philo *philo)
         }
         if (get_current() - (philo->last_time_eat) >= philo->time_to_die && check <= 0)
         {
-            puts("bslaaa");
             sem_wait(philo->mtx);
             print_operation(philo, get_current() - (philo->last_time_eat), 6);
             sem_post(philo->loop);
             break;
         }
         sem_post(philo->died);
-        // usleep(100);
     }
 }
 
@@ -97,7 +94,6 @@ void *func(void *val)
         get_fork(philo);
         start_eating(philo);
         end_eating(philo);
-        // usleep(10);
     }
     return (val);
 }

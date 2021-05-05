@@ -6,10 +6,7 @@
 #include <pthread.h>
 #include <unistd.h>
 #include <sys/time.h>
-#define EAT '1'
-#define NAN '0'
-#define SLEEPING '2'
-#define THINKING '3'
+#include <sys/stat.h>
 
 typedef struct s_philo
 {
