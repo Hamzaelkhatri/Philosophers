@@ -56,7 +56,6 @@ void *is_dead(t_philo *philo)
         sem_post(philo->died);
         usleep(100);
     }
-    exit(1);
     return (NULL);
 }
 
