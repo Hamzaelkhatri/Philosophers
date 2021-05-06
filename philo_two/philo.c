@@ -28,7 +28,8 @@ void *is_dead(t_philo *philo)
         check = -1;
     while (!philo->check_die)
     {
-        sem_wait(philo->died);
+        if (sem_wait(philo->died))
+            break;
         if (philo->num_to_eat != -1)
         {
             if (philo->num_to_eat == philo->done && !i)
@@ -39,9 +40,7 @@ void *is_dead(t_philo *philo)
             if (*(philo->finish) == philo->number_phil)
             {
                 philo->check_die = 1;
-                // sem_wait(philo->mtx);
                 sem_post(philo->mtx);
-
                 printf("\tSimulation stop all philosophers eat %i", philo->num_to_eat);
                 sem_post(philo->loop);
                 break;
