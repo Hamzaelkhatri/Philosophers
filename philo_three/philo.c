@@ -26,7 +26,7 @@ void *is_dead(t_philo *philo)
     check = philo->time_to_die - (philo->time_to_eat + philo->time_to_sleep);
     if (philo->time_to_die / philo->number_phil < 100)
         check = -1;
-    while (!philo->check_die)
+    while (1)
     {
         sem_wait(philo->died);
         if (philo->num_to_eat != -1)
@@ -47,15 +47,24 @@ void *is_dead(t_philo *philo)
         }
         if (get_current() - (philo->last_time_eat) >= philo->time_to_die && check <= 0)
         {
-            sem_wait(philo->mtx);
+            i = 1;
             philo->check_die = 1;
+            sem_wait(philo->mtx);
             print_operation(philo, get_current() - (philo->last_time_eat), 6);
+            usleep(100);
             sem_post(philo->loop);
+            sleep(50);
+
             break;
+            // exit(0);
         }
+        // if (i)
+
+        // usleep(100);
         sem_post(philo->died);
-        usleep(100);
+        // philo->check_die = 1;
     }
+
     // exit(0);
     return (NULL);
 }
@@ -90,12 +99,23 @@ void *func(void *val)
 {
     t_philo *philo;
     pthread_t thr;
+    int i = 0;
 
     philo = (t_philo *)val;
     pthread_create(&thr, NULL, (void *)is_dead, (void *)philo);
     pthread_detach(thr);
-    while (1)
+    while (!i)
     {
+        printf("{%i}", philo->check_die);
+
+        if (philo->check_die)
+        {
+            puts("done");
+
+            // exit(0);
+            break;
+        }
+        // exit(0);
         get_fork(philo);
         start_eating(philo);
         end_eating(philo);
@@ -139,18 +159,21 @@ void do_stuff(t_philosophers *philo)
             philo->philo[i]->finish = &(philo->finish);
             philosophers->print = philo->print;
             philosophers->mtx = philo->mtx;
+            // printf("[%i]", philosophers->check_die);
+            // if (philosophers->check_die)
+            // break;
             func(philosophers);
-            exit(0);
+
+            // exit(0);
         }
-        // if (philo->check_died)
-        // break;
-        // sleep(3);
         i++;
+        usleep(100);
+        // sleep(3);
     }
     i = 0;
     while (i < philo->number_phil)
     {
-        waitpid(1, NULL, 0);
+        waitpid(-1, NULL, 0);
         i++;
     }
 
@@ -161,9 +184,6 @@ void do_stuff(t_philosophers *philo)
 
 void destroy_sem(t_philosophers *philo)
 {
-    int i;
-
-    i = 0;
     sem_close(philo->died);
     sem_close(philo->loop);
     sem_close(philo->mtx);
@@ -201,6 +221,6 @@ int main(int ac, char **ag)
     philosopher = init(ag);
     init_mutex(philosopher);
     do_stuff(philosopher);
-    destroy_sem(philosopher);
+    // destroy_sem(philosopher);
     return (0);
 }

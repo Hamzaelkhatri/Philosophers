@@ -39,7 +39,9 @@ void *is_dead(t_philo *philo)
             if (*(philo->finish) == philo->number_phil)
             {
                 philo->check_die = 1;
-                sem_wait(philo->mtx);
+                // sem_wait(philo->mtx);
+                sem_post(philo->mtx);
+
                 printf("\tSimulation stop all philosophers eat %i", philo->num_to_eat);
                 sem_post(philo->loop);
                 break;
@@ -47,7 +49,7 @@ void *is_dead(t_philo *philo)
         }
         if (get_current() - (philo->last_time_eat) >= philo->time_to_die && check <= 0)
         {
-            sem_wait(philo->mtx);
+            sem_post(philo->mtx);
             philo->check_die = 1;
             print_operation(philo, get_current() - (philo->last_time_eat), 6);
             sem_post(philo->loop);
@@ -115,7 +117,7 @@ void init_mutex(t_philosophers *philo)
     philo->print = sem_open("/print", O_CREAT, 0777, 1);
     philo->died = sem_open("/died", O_CREAT, 0777, 1);
     philo->loop = sem_open("/loop", O_CREAT, 0777, 1);
-    philo->mtx = sem_open("/mtx", O_CREAT, 0777, 1);
+    philo->mtx = sem_open("/mtx", O_CREAT, 0777, 0);
 }
 
 void do_stuff(t_philosophers *philo)
@@ -146,7 +148,6 @@ void do_stuff(t_philosophers *philo)
     sem_wait(philo->loop);
     usleep(100);
     sem_post(philo->loop);
-    sem_post(philo->mtx);
 }
 
 void destroy_sem(t_philosophers *philo)
