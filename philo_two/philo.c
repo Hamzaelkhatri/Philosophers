@@ -31,15 +31,17 @@ void *is_dead(t_philo *philo)
         sem_wait(philo->died);
         if (get_current() - (philo->last_time_eat) >= philo->time_to_die) //&& check <= 0
         {
-            puts("here");
+            // puts("here");
             // exit(0);
             philo->check_die = 1;
             // sem_post(philo->print);
             // printf("\tdie %i", philo->name);
-            sem_post(philo->loop);
-            print_operation(philo, 0, 6);
-
+            // print_operation(philo, 0, 6);
             sem_wait(philo->print);
+            puts("philo_die");
+            sem_post(philo->loop);
+            usleep(400);
+            sem_post(philo->died);
             break;
         }
         sem_post(philo->died);
@@ -129,6 +131,10 @@ void do_stuff(t_philosophers *philo)
         i++;
     }
     sem_wait(philo->loop);
+    // sleep(100);
+    // puts("here");
+    // exit(0);
+    return;
     // usleep(100);
     // sem_post(philo->loop);
 }
@@ -173,6 +179,5 @@ int main(int ac, char **ag)
     philosopher = init(ag);
     init_mutex(philosopher);
     do_stuff(philosopher);
-    destroy_sem(philosopher);
     return (0);
 }
