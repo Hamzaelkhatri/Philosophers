@@ -43,9 +43,10 @@ void *is_dead(t_philo *philo)
                 sem_wait(philo->print);
                 printf("\tSimulation stop all philosophers eat %i", philo->num_to_eat);
                 sem_post(philo->loop);
-                usleep(400);
+                usleep(4000);
                 sem_post(philo->died);
-                break;
+                // exit(0);
+                return (NULL);
             }
         }
         if (get_current() - (philo->last_time_eat) >= philo->time_to_die && check <= 0)
@@ -57,6 +58,7 @@ void *is_dead(t_philo *philo)
             sem_post(philo->loop);
             usleep(400);
             sem_post(philo->died);
+            exit(0);
             return (NULL);
         }
         sem_post(philo->died);
@@ -86,7 +88,6 @@ void end_eating(t_philo *philo)
     sem_post(philo->forks);
     print_operation(philo, get_current() - philo->start, 4);
     usleep(philo->time_to_sleep * 1000);
-    printf("\e[0;35m %ld ms Philosopher %d is thinking\n", get_current() - philo->start, philo->name);
     print_operation(philo, get_current() - philo->start, 5);
 }
 
@@ -122,6 +123,23 @@ void init_mutex(t_philosophers *philo)
         philo->mtx = sem_open("/mtx", O_CREAT, 0777, philo->num_to_eat);
 }
 
+void clean_leaks(t_philosophers *philo)
+{
+    int i;
+
+    i = 0;
+    while (i < philo->number_phil)
+    {
+        free(philo->philo[i]);
+        i++;
+    }
+    // free(philo->mtx);
+    // free(philo->died);
+    // free(philo->loop);
+    // free(philo->philo);
+    free(philo);
+}
+
 void do_stuff(t_philosophers *philo)
 {
     int i;
@@ -150,14 +168,8 @@ void do_stuff(t_philosophers *philo)
         i++;
     }
     i = 0;
-    // while (i < philo->number_phil)
-    // {
-    //     wait(0);
-    //     i++;
-    // }
     sem_wait(philo->loop);
-
-    // clean_leaks(philo);
+    clean_leaks(philo);
     exit(0);
 }
 
@@ -167,23 +179,6 @@ void destroy_sem(t_philosophers *philo)
     sem_close(philo->loop);
     // sem_close(philo->mtx);
     sem_close(philo->forks);
-}
-
-void clean_leaks(t_philosophers *philo)
-{
-    int i;
-
-    i = 0;
-    while (i < philo->number_phil)
-    {
-        free(philo->philo[i]);
-        i++;
-    }
-    // free(philo->mtx);
-    // free(philo->died);
-    // free(philo->loop);
-    // free(philo->philo);
-    free(philo);
 }
 
 int main(int ac, char **ag)
