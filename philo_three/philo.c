@@ -29,6 +29,7 @@ void *is_dead(t_philo *philo)
     while (1)
     {
         sem_wait(philo->died);
+        // break;
         if (philo->num_to_eat != -1)
         {
             if (philo->num_to_eat == philo->done && !i)
@@ -39,9 +40,8 @@ void *is_dead(t_philo *philo)
             if (*(philo->finish) == philo->number_phil)
             {
                 philo->check_die = 1;
-                sem_wait(philo->mtx);
                 printf("\tSimulation stop all philosophers eat %i", philo->num_to_eat);
-                sem_post(philo->loop);
+                // sem_post(philo->loop);
                 break;
             }
         }
@@ -49,13 +49,14 @@ void *is_dead(t_philo *philo)
         {
             i = 1;
             philo->check_die = 1;
-            sem_wait(philo->mtx);
-            print_operation(philo, get_current() - (philo->last_time_eat), 6);
-            usleep(100);
+            sem_wait(philo->print);
+            // print_operation(philo, get_current() - (philo->last_time_eat), 6);
+            puts("philo_die");
             sem_post(philo->loop);
-            sleep(50);
-
-            break;
+            usleep(400);
+            sem_post(philo->died);
+            // break;
+            return (NULL);
             // exit(0);
         }
         // if (i)
@@ -63,6 +64,7 @@ void *is_dead(t_philo *philo)
         // usleep(100);
         sem_post(philo->died);
         // philo->check_die = 1;
+        // usleep(3000);
     }
 
     // exit(0);
@@ -106,16 +108,9 @@ void *func(void *val)
     pthread_detach(thr);
     while (!i)
     {
-        printf("{%i}", philo->check_die);
-
-        if (philo->check_die)
-        {
-            puts("done");
-
-            // exit(0);
-            break;
-        }
-        // exit(0);
+        // if (sem_wait(philo->print))
+        //     break;
+        // sem_post(philo->print);
         get_fork(philo);
         start_eating(philo);
         end_eating(philo);
@@ -129,12 +124,10 @@ void init_mutex(t_philosophers *philo)
     sem_unlink("/print");
     sem_unlink("/died");
     sem_unlink("/loop");
-    sem_unlink("/mtx");
     philo->forks = sem_open("/fork", O_CREAT, 0777, philo->number_phil);
     philo->print = sem_open("/print", O_CREAT, 0777, 1);
     philo->died = sem_open("/died", O_CREAT, 0777, 1);
     philo->loop = sem_open("/loop", O_CREAT, 0777, 1);
-    philo->mtx = sem_open("/mtx", O_CREAT, 0777, 1);
 }
 
 void do_stuff(t_philosophers *philo)
@@ -144,9 +137,9 @@ void do_stuff(t_philosophers *philo)
     t_philo *philosophers;
     pid_t f;
 
-    sem_wait(philo->loop);
     (philo->finish) = 0;
     i = 0;
+    sem_wait(philo->loop);
     while (i < philo->number_phil)
     {
         f = fork();
@@ -159,34 +152,35 @@ void do_stuff(t_philosophers *philo)
             philo->philo[i]->finish = &(philo->finish);
             philosophers->print = philo->print;
             philosophers->mtx = philo->mtx;
-            // printf("[%i]", philosophers->check_die);
-            // if (philosophers->check_die)
-            // break;
             func(philosophers);
-
-            // exit(0);
+            exit(0);
         }
         i++;
-        usleep(100);
-        // sleep(3);
     }
     i = 0;
-    while (i < philo->number_phil)
-    {
-        waitpid(-1, NULL, 0);
-        i++;
-    }
-
     sem_wait(philo->loop);
-    sem_post(philo->loop);
-    sem_post(philo->mtx);
+    exit(0);
+    // sem_post(philo->died);
+    // sem_post(philo->print);
+    // while (i < philo->number_phil)
+    // {
+    // waitpid(-1, NULL, 0);
+    // i++;
+    // }
+    // sem_wait(philo->loop);
+
+    // sem_wait(philo->loop);
+    // sem_wait(philo->loop);
+    // sem_wait(philo->loop);
+    // sem_wait(philo->loop);
+    // sem_post(philo->mtx);
 }
 
 void destroy_sem(t_philosophers *philo)
 {
     sem_close(philo->died);
     sem_close(philo->loop);
-    sem_close(philo->mtx);
+    // sem_close(philo->mtx);
     sem_close(philo->forks);
 }
 
