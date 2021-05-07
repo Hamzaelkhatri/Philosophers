@@ -29,33 +29,22 @@ void *is_dead(t_philo *philo)
     while (1)
     {
         sem_wait(philo->died);
-        // if (philo->num_to_eat != -1)
-        // {
-        //     if (philo->num_to_eat == philo->done && !i)
-        //     {
-        //         *(philo->finish) += 1;
-        //         i = 1;
-        //     }
-        //     if (*(philo->finish) == philo->number_phil)
-        //     {
-        //         sem_post(philo->print);
-        //         philo->check_die = 1;
-        //         printf("\tSimulation stop all philosophers eat %i", philo->num_to_eat);
-        //         sem_post(philo->loop);
-        //         break;
-        //     }
-        // }
         if (get_current() - (philo->last_time_eat) >= philo->time_to_die) //&& check <= 0
         {
+            puts("here");
+            // exit(0);
             philo->check_die = 1;
-            printf("\tdie %i", philo->name);
-            sem_post(philo->print);
+            // sem_post(philo->print);
+            // printf("\tdie %i", philo->name);
             sem_post(philo->loop);
+            print_operation(philo, 0, 6);
+
+            sem_wait(philo->print);
             break;
         }
         sem_post(philo->died);
-        // usleep(100);
     }
+    // sleep(1000);
     return (NULL);
 }
 
@@ -133,9 +122,10 @@ void do_stuff(t_philosophers *philo)
         philosophers->print = philo->print;
         pthread_create(&pth, NULL, (void *)func, (void *)philosophers);
         pthread_detach(pth);
-        if (philo->check_died)
-            break;
-        // usleep(10);
+        // if (philo->check_died)
+        // break;
+
+        usleep(100);
         i++;
     }
     sem_wait(philo->loop);
