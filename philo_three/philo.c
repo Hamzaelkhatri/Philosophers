@@ -28,27 +28,6 @@ void *is_dead(t_philo *philo)
         check = -1;
     while (1)
     {
-        sem_wait(philo->died);
-        // break;
-        if (philo->num_to_eat != -1)
-        {
-            if (philo->num_to_eat == philo->done && !i)
-            {
-                *(philo->finish) += 1;
-                i = 1;
-            }
-            if (*(philo->finish) == philo->number_phil)
-            {
-                philo->check_die = 1;
-                sem_wait(philo->print);
-                printf("\tSimulation stop all philosophers eat %i", philo->num_to_eat);
-                sem_post(philo->loop);
-                usleep(4000);
-                sem_post(philo->died);
-                // exit(0);
-                return (NULL);
-            }
-        }
         if (get_current() - (philo->last_time_eat) >= philo->time_to_die && check <= 0)
         {
             i = 1;
@@ -59,7 +38,6 @@ void *is_dead(t_philo *philo)
             usleep(400);
             sem_post(philo->died);
             exit(0);
-            return (NULL);
         }
         sem_post(philo->died);
     }
@@ -80,6 +58,7 @@ void start_eating(t_philo *philo)
     philo->last_time_eat = get_current();
     philo->done++;
     usleep(philo->time_to_eat * 1000);
+    sem_post(philo->mtx);
 }
 
 void end_eating(t_philo *philo)
@@ -115,12 +94,13 @@ void init_mutex(t_philosophers *philo)
     sem_unlink("/print");
     sem_unlink("/died");
     sem_unlink("/loop");
+    sem_unlink("/mtx");
     philo->forks = sem_open("/fork", O_CREAT, 0777, philo->number_phil);
     philo->print = sem_open("/print", O_CREAT, 0777, 1);
     philo->died = sem_open("/died", O_CREAT, 0777, 1);
     philo->loop = sem_open("/loop", O_CREAT, 0777, 1);
-    if (philo->num_to_eat != -1)
-        philo->mtx = sem_open("/mtx", O_CREAT, 0777, philo->num_to_eat);
+    // if (philo->num_to_eat != -1)
+    philo->mtx = sem_open("/mtx", O_CREAT, 0777, philo->num_to_eat);
 }
 
 void clean_leaks(t_philosophers *philo)
@@ -140,6 +120,45 @@ void clean_leaks(t_philosophers *philo)
     free(philo);
 }
 
+void check_eat(void *philosophers)
+{
+    // t_philo *philo;
+    t_philosophers *philo;
+    int i;
+    int j = 0;
+
+    i = 0;
+    philo = (t_philosophers *)philosophers;
+    // puts("here");
+    while (1)
+    {
+        sem_wait(philo->mtx);
+
+        // printf("[%i]\n", j);
+        // if (i >= philo->number_phil)
+        // i = 0;
+        if (j <= philo->number_phil * philo->num_to_eat + 1)
+        {
+            j++;
+        }
+        else
+        {
+            sem_wait(philo->print);
+            // printf("\e[0;33m \n", get_current() - philo->start, philo->name);
+            // puts("sdone");
+            printf("Simulation stop all philosophers eat %i at least", philo->num_to_eat);
+            sem_post(philo->loop);
+            clean_leaks(philo);
+            exit(0);
+        }
+        usleep(1000);
+        // i++;
+        // if (i >= philo->number_phil)
+        //     i = 0;
+        // exit(0);
+    }
+}
+
 void do_stuff(t_philosophers *philo)
 {
     int i;
@@ -150,6 +169,8 @@ void do_stuff(t_philosophers *philo)
     (philo->finish) = 0;
     i = 0;
     sem_wait(philo->loop);
+    pthread_create(&pth, NULL, (void *)check_eat, (void *)philo);
+    pthread_detach(pth);
     while (i < philo->number_phil)
     {
         f = fork();
@@ -168,7 +189,10 @@ void do_stuff(t_philosophers *philo)
         i++;
     }
     i = 0;
+    wait(0);
     sem_wait(philo->loop);
+    // sem_post(philo->mtx);
+    puts("done1");
     clean_leaks(philo);
     exit(0);
 }
@@ -177,7 +201,7 @@ void destroy_sem(t_philosophers *philo)
 {
     sem_close(philo->died);
     sem_close(philo->loop);
-    // sem_close(philo->mtx);
+    sem_close(philo->mtx);
     sem_close(philo->forks);
 }
 

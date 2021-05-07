@@ -137,19 +137,11 @@ void do_stuff(t_philosophers *philo)
         philosophers->print = philo->print;
         pthread_create(&pth, NULL, (void *)func, (void *)philosophers);
         pthread_detach(pth);
-        // if (philo->check_died)
-        // break;
-
         usleep(100);
         i++;
     }
     sem_wait(philo->loop);
-    // sleep(100);
-    // puts("here");
-    // exit(0);
     return;
-    // usleep(100);
-    // sem_post(philo->loop);
 }
 
 void destroy_sem(t_philosophers *philo)
