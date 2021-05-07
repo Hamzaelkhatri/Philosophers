@@ -40,8 +40,11 @@ void *is_dead(t_philo *philo)
             if (*(philo->finish) == philo->number_phil)
             {
                 philo->check_die = 1;
+                sem_wait(philo->print);
                 printf("\tSimulation stop all philosophers eat %i", philo->num_to_eat);
-                // sem_post(philo->loop);
+                sem_post(philo->loop);
+                usleep(400);
+                sem_post(philo->died);
                 break;
             }
         }
@@ -50,24 +53,14 @@ void *is_dead(t_philo *philo)
             i = 1;
             philo->check_die = 1;
             sem_wait(philo->print);
-            // print_operation(philo, get_current() - (philo->last_time_eat), 6);
-            puts("philo_die");
+            printf("\e[0;33m %ld ms %d is die\n", get_current() - philo->start, philo->name);
             sem_post(philo->loop);
             usleep(400);
             sem_post(philo->died);
-            // break;
             return (NULL);
-            // exit(0);
         }
-        // if (i)
-
-        // usleep(100);
         sem_post(philo->died);
-        // philo->check_die = 1;
-        // usleep(3000);
     }
-
-    // exit(0);
     return (NULL);
 }
 
@@ -108,9 +101,6 @@ void *func(void *val)
     pthread_detach(thr);
     while (!i)
     {
-        // if (sem_wait(philo->print))
-        //     break;
-        // sem_post(philo->print);
         get_fork(philo);
         start_eating(philo);
         end_eating(philo);
@@ -128,6 +118,8 @@ void init_mutex(t_philosophers *philo)
     philo->print = sem_open("/print", O_CREAT, 0777, 1);
     philo->died = sem_open("/died", O_CREAT, 0777, 1);
     philo->loop = sem_open("/loop", O_CREAT, 0777, 1);
+    if (philo->num_to_eat != -1)
+        philo->mtx = sem_open("/mtx", O_CREAT, 0777, philo->num_to_eat);
 }
 
 void do_stuff(t_philosophers *philo)
@@ -158,22 +150,15 @@ void do_stuff(t_philosophers *philo)
         i++;
     }
     i = 0;
-    sem_wait(philo->loop);
-    exit(0);
-    // sem_post(philo->died);
-    // sem_post(philo->print);
     // while (i < philo->number_phil)
     // {
-    // waitpid(-1, NULL, 0);
-    // i++;
+    //     wait(0);
+    //     i++;
     // }
-    // sem_wait(philo->loop);
+    sem_wait(philo->loop);
 
-    // sem_wait(philo->loop);
-    // sem_wait(philo->loop);
-    // sem_wait(philo->loop);
-    // sem_wait(philo->loop);
-    // sem_post(philo->mtx);
+    // clean_leaks(philo);
+    exit(0);
 }
 
 void destroy_sem(t_philosophers *philo)
@@ -194,10 +179,10 @@ void clean_leaks(t_philosophers *philo)
         free(philo->philo[i]);
         i++;
     }
-    free(philo->mtx);
-    free(philo->died);
-    free(philo->loop);
-    free(philo->philo);
+    // free(philo->mtx);
+    // free(philo->died);
+    // free(philo->loop);
+    // free(philo->philo);
     free(philo);
 }
 
