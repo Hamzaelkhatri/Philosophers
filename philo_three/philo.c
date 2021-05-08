@@ -114,10 +114,7 @@ void clean_leaks(t_philosophers *philo)
         free(philo->philo[i]);
         i++;
     }
-    // free(philo->mtx);
-    // free(philo->died);
-    // free(philo->loop);
-    // free(philo->philo);
+    free(philo->philo);
     free(philo);
 }
 
@@ -152,6 +149,14 @@ void check_eat(void *philosophers)
         //     i = 0;
         // exit(0);
     }
+}
+
+void destroy_sem(t_philosophers *philo)
+{
+    sem_close(philo->died);
+    sem_close(philo->loop);
+    sem_close(philo->mtx);
+    sem_close(philo->forks);
 }
 
 void do_stuff(t_philosophers *philo)
@@ -189,18 +194,9 @@ void do_stuff(t_philosophers *philo)
     i = 0;
     // wait(0);
     sem_wait(philo->loop);
-    // sem_post(philo->mtx);
-    // puts("done1");
+    destroy_sem(philo);
     clean_leaks(philo);
     exit(0);
-}
-
-void destroy_sem(t_philosophers *philo)
-{
-    sem_close(philo->died);
-    sem_close(philo->loop);
-    sem_close(philo->mtx);
-    sem_close(philo->forks);
 }
 
 int main(int ac, char **ag)
