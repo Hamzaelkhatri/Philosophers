@@ -1,0 +1,128 @@
+2 ms Philosopher 3 has taking a fork
+ 3 ms Philosopher 3 has taking a fork
+ 3 ms Philosopher 3 is eating
+ 3 ms Philosopher 2 has taking a fork
+ 3 ms Philosopher 2 has taking a fork
+ 3 ms Philosopher 2 is eating
+ 203 ms Philosopher 3 is sleeping
+ 203 ms Philosopher 2 is sleeping
+ 203 ms Philosopher 4 has taking a fork
+ 203 ms Philosopher 4 has taking a fork
+ 203 ms Philosopher 4 is eating
+ 204 ms Philosopher 1 has taking a fork
+ 204 ms Philosopher 1 has taking a fork
+ 204 ms Philosopher 1 is eating
+ 303 ms Philosopher 3 is thinking
+ 303 ms Philosopher 2 is thinking
+ 404 ms Philosopher 4 is sleeping
+ 404 ms Philosopher 1 is sleeping
+ 404 ms Philosopher 3 has taking a fork
+ 404 ms Philosopher 3 has taking a fork
+ 404 ms Philosopher 3 is eating
+ 404 ms Philosopher 2 has taking a fork
+ 404 ms Philosopher 2 has taking a fork
+ 404 ms Philosopher 2 is eating
+ 504 ms Philosopher 4 is thinking
+ 504 ms Philosopher 1 is thinking
+ 604 ms Philosopher 3 is sleeping
+ 604 ms Philosopher 2 is sleeping
+ 604 ms Philosopher 4 has taking a fork
+ 604 ms Philosopher 4 has taking a fork
+ 604 ms Philosopher 4 is eating
+ 604 ms Philosopher 1 has taking a fork
+ 604 ms Philosopher 1 has taking a fork
+ 604 ms Philosopher 1 is eating
+ 704 ms Philosopher 3 is thinking
+ 704 ms Philosopher 2 is thinking
+ 804 ms Philosopher 4 is sleeping
+ 804 ms Philosopher 1 is sleeping
+ 804 ms Philosopher 3 has taking a fork
+ 804 ms Philosopher 3 has taking a fork
+ 804 ms Philosopher 3 is eating
+ 804 ms Philosopher 2 has taking a fork
+ 804 ms Philosopher 2 has taking a fork
+ 804 ms Philosopher 2 is eating
+ 904 ms Philosopher 4 is thinking
+ 904 ms Philosopher 1 is thinking
+ 1004 ms Philosopher 3 is sleeping
+ 1004 ms Philosopher 2 is sleeping
+ 1004 ms Philosopher 4 has taking a fork
+ 1004 ms Philosopher 4 has taking a fork
+ 1004 ms Philosopher 4 is eating
+ 1004 ms Philosopher 1 has taking a fork
+ 1004 ms Philosopher 1 has taking a fork
+ 1004 ms Philosopher 1 is eating
+ 1104 ms Philosopher 3 is thinking
+ 1104 ms Philosopher 2 is thinking
+ 1204 ms Philosopher 4 is sleeping
+ 1204 ms Philosopher 1 is sleeping
+ 1204 ms Philosopher 3 has taking a fork
+ 1204 ms Philosopher 3 has taking a fork
+ 1204 ms Philosopher 3 is eating
+ 1204 ms Philosopher 2 has taking a fork
+ 1204 ms Philosopher 2 has taking a fork
+ 1204 ms Philosopher 2 is eating
+ 1304 ms Philosopher 4 is thinking
+ 1304 ms Philosopher 1 is thinking
+ 1404 ms Philosopher 3 is sleeping
+ 1404 ms Philosopher 2 is sleeping
+ 1404 ms Philosopher 4 has taking a fork
+ 1404 ms Philosopher 4 has taking a fork
+ 1404 ms Philosopher 4 is eating
+ 1404 ms Philosopher 1 has taking a fork
+ 1404 ms Philosopher 1 has taking a fork
+ 1404 ms Philosopher 1 is eating
+ 1504 ms Philosopher 3 is thinking
+ 1504 ms Philosopher 2 is thinking
+ 1604 ms Philosopher 4 is sleeping
+ 1604 ms Philosopher 1 is sleeping
+ 1604 ms Philosopher 3 has taking a fork
+ 1604 ms Philosopher 3 has taking a fork
+ 1604 ms Philosopher 3 is eating
+ 1604 ms Philosopher 2 has taking a fork
+ 1604 ms Philosopher 2 has taking a fork
+ 1604 ms Philosopher 2 is eating
+ 1704 ms Philosopher 4 is thinking
+ 1704 ms Philosopher 1 is thinking
+ 1804 ms Philosopher 3 is sleeping
+ 1804 ms Philosopher 2 is sleeping
+ 1804 ms Philosopher 4 has taking a fork
+ 1804 ms Philosopher 4 has taking a fork
+ 1804 ms Philosopher 4 is eating
+ 1804 ms Philosopher 1 has taking a fork
+ 1804 ms Philosopher 1 has taking a fork
+ 1804 ms Philosopher 1 is eating
+ 1904 ms Philosopher 3 is thinking
+ 1904 ms Philosopher 2 is thinking
+ 2004 ms Philosopher 4 is sleeping
+ 2004 ms Philosopher 1 is sleeping
+ 2004 ms Philosopher 3 has taking a fork
+ 2004 ms Philosopher 3 has taking a fork
+ 2004 ms Philosopher 3 is eating
+ 2004 ms Philosopher 2 has taking a fork
+ 2004 ms Philosopher 2 has taking a fork
+ 2004 ms Philosopher 2 is eating
+ 2104 ms Philosopher 4 is thinking
+ 2104 ms Philosopher 1 is thinking
+ 2205 ms Philosopher 3 is sleeping
+ 2205 ms Philosopher 2 is sleeping
+ 2205 ms Philosopher 4 has taking a fork
+ 2205 ms Philosopher 4 has taking a fork
+ 2205 ms Philosopher 4 is eating
+ 2205 ms Philosopher 1 has taking a fork
+ 2205 ms Philosopher 1 has taking a fork
+ 2205 ms Philosopher 1 is eating
+ 2305 ms Philosopher 3 is thinking
+ 2305 ms Philosopher 2 is thinking
+ 2405 ms Philosopher 4 is sleeping
+ 2405 ms Philosopher 1 is sleeping
+ 2405 ms Philosopher 3 has taking a fork
+ 2405 ms Philosopher 3 has taking a fork
+ 2405 ms Philosopher 3 is eating
+ 2405 ms Philosopher 2 has taking a fork
+ 2405 ms Philosopher 2 has taking a fork
+ 2405 ms Philosopher 2 is eating
+ 2505 ms Philosopher 4 is thinking
+ 2505 ms Philosopher 1 is thinking
+ 2605 ms Philosopher 3 is sleeping
+ 2605 ms Philosopher 2 is sleeping
