@@ -5,7 +5,7 @@ OBJ_PATH= obj
 TOOLS_PATH= obj/tools
 
 TOOLS= ./tools/ft_atoi.c ./tools/ft_itoa.c
-SRC= philo.c init.c $(TOOLS)
+SRC= philo.c init.c start.c operations.c error.c print_op.c $(TOOLS)
 HDR_NAME= philosophers.h
 
 OBJ_NAME= $(SRC:.c=.o)
